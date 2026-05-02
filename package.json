@@ -2,7 +2,9 @@
   "name": "task-tracker",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "prisma generate && prisma migrate deploy && next build",
