@@ -37,6 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   pages: {
-    signIn: "/login",
+    // Locale prefix is added by next-intl middleware on first hit.
+    signIn: "/uk/login",
   },
 });

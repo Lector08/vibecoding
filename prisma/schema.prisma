@@ -1,5 +1,9 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // Vercel serverless functions run on Amazon Linux 2 with OpenSSL 3.x.
+  // Without this target, Prisma may fail to load its query engine at
+  // runtime even though the build itself succeeds.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
