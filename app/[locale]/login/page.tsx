@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { redirect } from "@/i18n/routing";
+import { redirect } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { signInWithGoogle } from "@/lib/actions/auth";
 import { Header } from "@/components/features/header";
