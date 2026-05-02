@@ -1,24 +1,18 @@
-import "../globals.css";
-import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { routing, type Locale } from "@/i18n/routing";
 
-export const metadata: Metadata = {
-  title: "Task Wizard",
-  description: "Personal task tracker with natural-language input.",
-  icons: {
-    icon: "/icon.png",
-    apple: "/apple-icon.png",
-  },
-};
-
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// Locale-scoped layout. The <html>/<body> wrapper lives in app/layout.tsx
+// because we now have unlocalized redirect pages (app/page.tsx,
+// app/login/page.tsx) that need a root layout too. Only one layout in
+// the tree may render <html>, so we keep providers here and wrappers up
+// in the root.
 export default async function LocaleLayout({
   children,
   params,
@@ -36,19 +30,15 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className="min-h-screen bg-background font-sans text-foreground">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <NextIntlClientProvider messages={messages}>
-            {children}
-          </NextIntlClientProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <NextIntlClientProvider messages={messages} locale={locale}>
+        {children}
+      </NextIntlClientProvider>
+    </ThemeProvider>
   );
 }
