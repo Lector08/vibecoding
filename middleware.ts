@@ -1,5 +1,17 @@
 import createIntlMiddleware from "next-intl/middleware";
-import { routing } from "./i18n/routing";
+import { defineRouting } from "next-intl/routing";
+
+// IMPORTANT: keep the routing config inlined here. When middleware runs on
+// Vercel's Node.js runtime the bundler does NOT inline cross-file imports,
+// so a `from "./i18n/routing"` (or "@/i18n/routing") resolves to a sibling
+// file that the strict ESM resolver then refuses to load without a ".js"
+// extension. Defining `routing` in-place sidesteps the whole issue.
+// The exported `routing` from `i18n/routing.ts` must stay in sync with this.
+const routing = defineRouting({
+  locales: ["uk", "en"],
+  defaultLocale: "uk",
+  localePrefix: "always",
+});
 
 export default createIntlMiddleware(routing);
 
