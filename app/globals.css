@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Surfaces — warm parchment vibe */
+    --background: 40 30% 97%;
+    --foreground: 180 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 180 30% 12%;
+
+    /* Brand — forest green (the wizard's robe) */
+    --primary: 145 32% 32%;
+    --primary-foreground: 40 30% 97%;
+
+    /* Secondary — teal blue (the icon background) */
+    --secondary: 192 32% 50%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 180 16% 94%;
+    --muted-foreground: 180 12% 38%;
+
+    --accent: 192 35% 90%;
+    --accent-foreground: 180 30% 12%;
+
+    /* Destructive / overdue — the red dot on the calendar */
+    --destructive: 4 70% 53%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 180 15% 87%;
+    --input: 180 15% 87%;
+    --ring: 145 32% 32%;
+
+    --priority-high: 4 70% 53%;
+    --priority-medium: 38 92% 50%;
+    --priority-low: 145 45% 40%;
+
+    --radius: 0.625rem;
+    --font-sans: ui-sans-serif, system-ui;
+  }
+
+  .dark {
+    /* Deep teal night — feels like wizard's evening */
+    --background: 195 28% 10%;
+    --foreground: 40 25% 92%;
+
+    --card: 195 24% 13%;
+    --card-foreground: 40 25% 92%;
+
+    --primary: 145 38% 56%;
+    --primary-foreground: 195 28% 10%;
+
+    --secondary: 192 32% 38%;
+    --secondary-foreground: 40 25% 92%;
+
+    --muted: 195 16% 19%;
+    --muted-foreground: 180 12% 65%;
+
+    --accent: 195 22% 22%;
+    --accent-foreground: 40 25% 92%;
+
+    --destructive: 4 65% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 195 16% 22%;
+    --input: 195 16% 22%;
+    --ring: 145 38% 56%;
+
+    --priority-high: 4 70% 60%;
+    --priority-medium: 38 88% 60%;
+    --priority-low: 145 42% 56%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}

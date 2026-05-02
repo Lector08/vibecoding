@@ -1,0 +1,78 @@
+---
+alwaysApply: true
+---
+---
+description: Core project rules — always apply
+alwaysApply: true
+---
+
+# Project: AI Task Tracker
+
+Personal task tracker. Users write tasks in natural language;
+GPT-4o-mini parses them into structured fields. Deployed on Vercel.
+
+## Stack
+Next.js 15 App Router · TypeScript strict · Tailwind · Prisma · Neon
+Postgres · NextAuth v5 (Google) · OpenAI · next-intl · Google Calendar API.
+
+## Non-negotiable rules
+
+### Internationalization (i18n)
+- UI is bilingual: Ukrainian (default) + English toggle
+- NEVER hardcode user-visible text in components
+- Every string lives in `messages/uk.json` and `messages/en.json`
+- When you add a new string, add it to BOTH files in the same PR
+- Use next-intl `useTranslations()` (client) or `getTranslations()` (server)
+- Translation keys are namespaced: `tasks.addButton`, `auth.signInWithGoogle`
+
+### Theming
+- Light + dark mode via Tailwind `darkMode: "class"` strategy
+- All colors come from CSS variables defined on `:root` and `.dark`
+- NEVER use raw hex / Tailwind color names like `bg-red-500` for theme colors
+- Use semantic tokens: `bg-background`, `text-foreground`, `border-border`,
+  `bg-primary`, `bg-destructive`, etc. (shadcn convention)
+- Theme provider must read system preference on first mount; respect
+  user override after that; persist to localStorage
+
+### TypeScript
+- Strict mode on. No `any` without a written reason in a comment.
+- Validate ALL external data with Zod: AI responses, form inputs,
+  env vars, API route bodies.
+- Server Components by default. Add `"use client"` only when you need
+  state, effects, or browser APIs.
+
+### Data flow
+- Mutations through Server Actions, not API routes (unless needed for
+  external webhooks like Google Calendar push notifications)
+- Every mutation: validate input → check session → write to DB →
+  revalidate path → return typed result
+
+### Security
+- Every Server Action and route handler checks `auth()` first
+- `userId` is always taken from the session, never from the client
+- Never log secrets; never commit `.env*` files
+- Google Calendar tokens are encrypted at rest (NextAuth handles this
+  if configured correctly)
+
+### File structure
+- `app/[locale]/...` — all routes wrapped in locale segment
+- `components/ui/` — reusable primitives (button, input, dialog, ...)
+- `components/features/` — feature-specific components
+- `lib/` — db client, auth config, openai client, gcal client, utils
+- `lib/actions/` — Server Actions, one file per feature
+- `lib/schemas/` — Zod schemas
+- `messages/uk.json`, `messages/en.json`
+- `prisma/schema.prisma`
+
+### Conventions
+- Code comments in English; commit messages in English
+- File names kebab-case; components PascalCase; functions camelCase
+- Prefer named exports
+- Reuse existing utilities in `lib/` before writing new ones —
+  ALWAYS grep first
+
+## After every change you make
+1. List changed files
+2. Note any new translation keys added (must exist in both uk.json and en.json)
+3. Note any new env vars (must be added to env validation + .env.example)
+4. State what I should manually test
