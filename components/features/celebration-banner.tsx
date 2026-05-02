@@ -24,19 +24,19 @@ export function CelebrationBanner({ imageSrc }: Props) {
     >
       <div
         className={cn(
-          "flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden",
+          "flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden",
           "rounded-lg bg-card",
         )}
       >
         {imageBroken ? (
-          <CheckCircle2 className="h-9 w-9 text-primary" />
+          <CheckCircle2 className="h-10 w-10 text-primary" />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imageSrc}
             alt=""
             onError={() => setImageBroken(true)}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover object-top"
           />
         )}
       </div>
