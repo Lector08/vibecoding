@@ -14,6 +14,13 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "1mb",
     },
+    // Required by Vercel to deploy middleware with `runtime: "nodejs"`.
+    // Even though Next.js 15.5 marks Node.js middleware as stable, Vercel's
+    // function bundler still needs this flag to wrap the middleware in the
+    // correct Node.js Lambda layer. Without it the function is shipped as
+    // ESM but loaded by the CJS loader and crashes at boot with
+    // "Cannot use import statement outside a module".
+    nodeMiddleware: true,
   },
 };
 
