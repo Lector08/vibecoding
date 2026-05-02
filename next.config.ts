@@ -14,14 +14,18 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "1mb",
     },
-    // Required by Vercel to deploy middleware with `runtime: "nodejs"`.
-    // Next.js 15.5 marks Node.js middleware as stable in release notes and
-    // removed the option from the typed `ExperimentalConfig`, but Vercel's
-    // function bundler still needs this flag set explicitly. Without it the
-    // middleware is shipped as ESM but loaded by the CJS loader and crashes
-    // at boot with "Cannot use import statement outside a module".
-    // @ts-expect-error -- option exists at runtime but is no longer typed
-    nodeMiddleware: true,
+  },
+  // We deliberately do NOT use a next-intl middleware. On Vercel the
+  // bundler crashed both Edge runtime (MIDDLEWARE_INVOCATION_FAILED with
+  // no actionable trace) and Node runtime (CJS/ESM mismatch when loading
+  // /var/task/middleware.js). Defaulting to /uk via a static redirect is
+  // simpler, faster, and avoids the entire problem class. The locale
+  // switcher in the UI handles user-driven changes after first load.
+  async redirects() {
+    return [
+      { source: "/", destination: "/uk", permanent: false },
+      { source: "/login", destination: "/uk/login", permanent: false },
+    ];
   },
 };
 
