@@ -1,6 +1,10 @@
 import OpenAI from "openai";
 import { env } from "@/env";
-import { priorityEnum, type ParsedTask } from "@/lib/schemas/task";
+import {
+  categoryEnum,
+  priorityEnum,
+  type ParsedTask,
+} from "@/lib/schemas/task";
 
 interface ParseContext {
   /** IANA timezone for the user (e.g. "Europe/Kyiv"). Falls back to UTC. */
@@ -24,7 +28,7 @@ const responseJsonSchema = {
   schema: {
     type: "object",
     additionalProperties: false,
-    required: ["title", "priority", "deadline"],
+    required: ["title", "priority", "category", "deadline"],
     properties: {
       title: {
         type: "string",
@@ -36,6 +40,12 @@ const responseJsonSchema = {
         enum: ["high", "medium", "low"],
         description:
           "high = urgent/important/ASAP/критично/терміново. low = когда-нибудь/потім/low priority. medium = anything else.",
+      },
+      category: {
+        type: "string",
+        enum: ["work", "personal", "study", "other"],
+        description:
+          "work = office/clients/meetings/work projects/робота/нарада/проєкт. study = courses/lectures/homework/reading/learning/навчання/курс/лекція. personal = home/health/family/errands/friends/особисте/побут/родина/друзі. other = anything that doesn't clearly fit. When uncertain, prefer 'personal'.",
       },
       deadline: {
         type: ["string", "null"],
@@ -62,6 +72,7 @@ function buildSystemPrompt(ctx: ParseContext): string {
     "- Output a concise, action-oriented `title` in the SAME language the user wrote in. Do not translate.",
     "- Strip deadline phrases and priority adjectives from the title (the title should describe WHAT to do, not WHEN or HOW URGENT).",
     "- Infer `priority` from explicit words. Words like 'urgent', 'important', 'ASAP', 'critical', 'критично', 'терміново', 'важливо', 'срочно' → high. Words like 'someday', 'low priority', 'eventually', 'потім', 'колись' → low. Otherwise medium.",
+    "- Infer `category` from the topic. work = job, clients, meetings, deadlines at work. study = lectures, courses, exams, reading, learning. personal = errands, home, family, health, social. other = ambiguous or doesn't fit. When unsure prefer 'personal'.",
     "- Infer `deadline` only if the user mentions a date, day name, or relative time. Common conventions:",
     "  * 'today' = today at 17:00 in the user's timezone",
     "  * 'tomorrow' / 'завтра' = next day at 17:00 in the user's timezone",
@@ -77,6 +88,7 @@ function fallback(rawInput: string): ParsedTask {
   return {
     title: rawInput.trim().slice(0, 200),
     priority: "medium",
+    category: "personal",
     deadline: null,
   };
 }
@@ -134,10 +146,12 @@ export async function parseTask(
     const candidate = parsed as Record<string, unknown>;
     const titleRaw = typeof candidate.title === "string" ? candidate.title.trim() : "";
     const priorityResult = priorityEnum.safeParse(candidate.priority);
+    const categoryResult = categoryEnum.safeParse(candidate.category);
 
     return {
       title: (titleRaw.length > 0 ? titleRaw : trimmed).slice(0, 200),
       priority: priorityResult.success ? priorityResult.data : "medium",
+      category: categoryResult.success ? categoryResult.data : "personal",
       deadline: coerceDeadline(candidate.deadline),
     };
   } catch {

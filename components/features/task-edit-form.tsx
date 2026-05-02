@@ -5,7 +5,9 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { updateTask } from "@/lib/actions/tasks";
 import {
+  CATEGORIES,
   DURATION_PRESETS,
+  type Category,
   type DurationPreset,
   type Priority,
   type UpdateTaskInput,
@@ -20,6 +22,8 @@ export interface TaskEditableTask {
   id: string;
   title: string;
   priority: string;
+  category?: string | null;
+  notes?: string | null;
   deadline: Date | null;
   durationMinutes?: number | null;
 }
@@ -28,6 +32,8 @@ export interface TaskSavedPayload {
   id: string;
   title: string;
   priority: string;
+  category: string | null;
+  notes: string | null;
   deadline: Date | null;
   hasCalendarEvent: boolean;
 }
@@ -75,6 +81,13 @@ function asPriority(value: string): Priority {
   return value === "high" || value === "low" ? value : "medium";
 }
 
+function asCategory(value: string | null | undefined): Category {
+  if (value === "work" || value === "personal" || value === "study" || value === "other") {
+    return value;
+  }
+  return "personal";
+}
+
 function asDuration(value: number | null | undefined): DurationPreset {
   const n = value ?? DEFAULT_DURATION;
   return (DURATION_PRESETS as readonly number[]).includes(n)
@@ -98,6 +111,8 @@ export function TaskEditForm({
 
   const [title, setTitle] = useState(task.title);
   const [priority, setPriority] = useState<Priority>(asPriority(task.priority));
+  const [category, setCategory] = useState<Category>(asCategory(task.category));
+  const [notes, setNotes] = useState(task.notes ?? "");
   const [date, setDate] = useState(() => toDateInput(task.deadline));
   const [time, setTime] = useState(() => toTimeInput(task.deadline));
   const [duration, setDuration] = useState<DurationPreset>(() =>
@@ -108,6 +123,8 @@ export function TaskEditForm({
   useEffect(() => {
     setTitle(task.title);
     setPriority(asPriority(task.priority));
+    setCategory(asCategory(task.category));
+    setNotes(task.notes ?? "");
     setDate(toDateInput(task.deadline));
     setTime(toTimeInput(task.deadline));
     setDuration(asDuration(task.durationMinutes ?? null));
@@ -135,10 +152,13 @@ export function TaskEditForm({
     }
     setError(null);
 
+    const trimmedNotes = notes.trim();
     const payload: UpdateTaskInput = {
       taskId: task.id,
       title: trimmed,
       priority,
+      category,
+      notes: trimmedNotes.length === 0 ? null : trimmedNotes,
       // Always send deadline so the user can clear it.
       deadline: computedDeadline,
       // Only send duration when there's a deadline; otherwise it's meaningless.
@@ -153,6 +173,8 @@ export function TaskEditForm({
           id: result.data.id,
           title: result.data.title,
           priority: result.data.priority,
+          category: result.data.category,
+          notes: result.data.notes,
           deadline: result.data.deadline,
           hasCalendarEvent: result.data.hasCalendarEvent,
         });
@@ -217,6 +239,26 @@ export function TaskEditForm({
         </label>
         <label className="flex flex-col gap-1 text-xs">
           <span className="font-medium text-muted-foreground">
+            {t("fieldCategory")}
+          </span>
+          <select
+            value={category}
+            disabled={isPending}
+            onChange={(e) => setCategory(e.target.value as Category)}
+            className={cn(
+              "h-9 rounded-md border border-input bg-card px-2 text-sm",
+              "text-foreground focus:border-ring transition-colors",
+            )}
+          >
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {t(`category.${c}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-xs">
+          <span className="font-medium text-muted-foreground">
             {t("fieldDate")}
           </span>
           <input
@@ -246,7 +288,7 @@ export function TaskEditForm({
             )}
           />
         </label>
-        <label className="flex flex-col gap-1 text-xs">
+        <label className="flex flex-col gap-1 text-xs sm:col-span-2">
           <span className="font-medium text-muted-foreground">
             {t("fieldDuration")}
           </span>
@@ -266,6 +308,23 @@ export function TaskEditForm({
               </option>
             ))}
           </select>
+        </label>
+        <label className="flex flex-col gap-1 text-xs sm:col-span-2">
+          <span className="font-medium text-muted-foreground">
+            {t("fieldNotes")}
+          </span>
+          <textarea
+            value={notes}
+            maxLength={2000}
+            rows={2}
+            disabled={isPending}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder={t("notesPlaceholder")}
+            className={cn(
+              "min-h-[3.5rem] rounded-md border border-input bg-card px-2 py-1.5 text-sm",
+              "text-foreground placeholder:text-muted-foreground focus:border-ring transition-colors",
+            )}
+          />
         </label>
       </div>
 

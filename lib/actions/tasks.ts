@@ -32,6 +32,8 @@ export interface CreatedTask {
   id: string;
   title: string;
   priority: string;
+  category: string | null;
+  notes: string | null;
   deadline: Date | null;
   done: boolean;
   hasCalendarEvent: boolean;
@@ -77,6 +79,7 @@ export async function createTaskFromText(
         rawInput: parsed.data.rawInput,
         title: ai.title,
         priority: ai.priority,
+        category: ai.category,
         deadline: finalDeadline,
         durationMinutes: parsed.data.durationMinutes ?? null,
       },
@@ -84,6 +87,8 @@ export async function createTaskFromText(
         id: true,
         title: true,
         priority: true,
+        category: true,
+        notes: true,
         deadline: true,
         done: true,
         gcalEventId: true,
@@ -96,6 +101,8 @@ export async function createTaskFromText(
         id: created.id,
         title: created.title,
         priority: created.priority,
+        category: created.category,
+        notes: created.notes,
         deadline: created.deadline,
         done: created.done,
         hasCalendarEvent: !!created.gcalEventId,
@@ -120,18 +127,30 @@ export async function updateTask(
     return { ok: false, error: "validation", messageKey: first };
   }
 
-  const { taskId, title, priority, deadline, durationMinutes, timezone } =
-    parsed.data;
+  const {
+    taskId,
+    title,
+    priority,
+    category,
+    notes,
+    deadline,
+    durationMinutes,
+    timezone,
+  } = parsed.data;
 
   // Build partial Prisma update — only include fields the caller sent.
   const data: {
     title?: string;
     priority?: string;
+    category?: string | null;
+    notes?: string | null;
     deadline?: Date | null;
     durationMinutes?: number | null;
   } = {};
   if (title !== undefined) data.title = title;
   if (priority !== undefined) data.priority = priority;
+  if (category !== undefined) data.category = category;
+  if (notes !== undefined) data.notes = notes;
   if (deadline !== undefined) data.deadline = deadline ? new Date(deadline) : null;
   if (durationMinutes !== undefined) data.durationMinutes = durationMinutes;
 
@@ -144,6 +163,8 @@ export async function updateTask(
         title: true,
         rawInput: true,
         priority: true,
+        category: true,
+        notes: true,
         deadline: true,
         durationMinutes: true,
         done: true,
@@ -191,6 +212,8 @@ export async function updateTask(
         id: updated.id,
         title: updated.title,
         priority: updated.priority,
+        category: updated.category,
+        notes: updated.notes,
         deadline: updated.deadline,
         done: updated.done,
         hasCalendarEvent: !!updated.gcalEventId && !!updated.deadline,

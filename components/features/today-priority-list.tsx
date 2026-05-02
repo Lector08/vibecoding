@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { CelebrationBanner } from "./celebration-banner";
+import { DailyDigest } from "./daily-digest";
 import { TaskCard } from "./task-card";
 import { addDays, isSameDay, toIsoDate } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
@@ -159,6 +160,7 @@ export async function TodayPriorityList({ date, tasks }: Props) {
             <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
+        <DailyDigest date={date} />
       </div>
 
       {dayTasks.length === 0 && noDeadlineTasks.length === 0 ? (

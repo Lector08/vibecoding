@@ -68,6 +68,8 @@ model Task {
   rawInput        String    @db.Text
   title           String
   priority        String    // high | medium | low
+  category        String?   // work | personal | study | other (AI-inferred)
+  notes           String?   @db.Text
   deadline        DateTime?
   durationMinutes Int?      // null => default 30 when syncing to Calendar
   done            Boolean   @default(false)
@@ -78,4 +80,5 @@ model Task {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, done, deadline])
+  @@index([userId, category])
 }

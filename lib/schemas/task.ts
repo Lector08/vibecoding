@@ -3,9 +3,19 @@ import { z } from "zod";
 export const priorityEnum = z.enum(["high", "medium", "low"]);
 export type Priority = z.infer<typeof priorityEnum>;
 
+export const categoryEnum = z.enum(["work", "personal", "study", "other"]);
+export type Category = z.infer<typeof categoryEnum>;
+export const CATEGORIES: readonly Category[] = [
+  "work",
+  "personal",
+  "study",
+  "other",
+];
+
 export const parsedTaskSchema = z.object({
   title: z.string().min(1).max(200),
   priority: priorityEnum,
+  category: categoryEnum,
   deadline: z
     .string()
     .datetime({ offset: true })
@@ -55,6 +65,18 @@ export const updateTaskInputSchema = z.object({
   taskId: z.string().min(1),
   title: z.string().trim().min(1, "errorEmpty").max(200, "errorTooLong").optional(),
   priority: priorityEnum.optional(),
+  category: z.union([categoryEnum, z.null()]).optional(),
+  notes: z
+    .string()
+    .max(2000, "errorTooLong")
+    .nullable()
+    .optional()
+    .transform((v) => {
+      if (v === undefined) return undefined;
+      if (v === null) return null;
+      const trimmed = v.trim();
+      return trimmed.length === 0 ? null : trimmed;
+    }),
   deadline: z
     .union([z.string().datetime({ offset: true }), z.null()])
     .optional(),

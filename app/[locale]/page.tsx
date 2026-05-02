@@ -52,6 +52,8 @@ export default async function HomePage({
       id: true,
       title: true,
       priority: true,
+      category: true,
+      notes: true,
       deadline: true,
       durationMinutes: true,
       done: true,

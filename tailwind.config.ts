@@ -43,6 +43,12 @@ const config: Config = {
           medium: "hsl(var(--priority-medium) / <alpha-value>)",
           low: "hsl(var(--priority-low) / <alpha-value>)",
         },
+        category: {
+          work: "hsl(var(--category-work) / <alpha-value>)",
+          personal: "hsl(var(--category-personal) / <alpha-value>)",
+          study: "hsl(var(--category-study) / <alpha-value>)",
+          other: "hsl(var(--category-other) / <alpha-value>)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

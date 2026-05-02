@@ -37,6 +37,11 @@
     --priority-medium: 38 92% 50%;
     --priority-low: 145 45% 40%;
 
+    --category-work: 215 65% 50%;
+    --category-personal: 25 80% 55%;
+    --category-study: 270 55% 58%;
+    --category-other: 215 12% 50%;
+
     --radius: 0.625rem;
     --font-sans: ui-sans-serif, system-ui;
   }
@@ -71,6 +76,11 @@
     --priority-high: 4 70% 60%;
     --priority-medium: 38 88% 60%;
     --priority-low: 145 42% 56%;
+
+    --category-work: 215 70% 65%;
+    --category-personal: 25 85% 65%;
+    --category-study: 270 55% 70%;
+    --category-other: 215 15% 60%;
   }
 
   * {
